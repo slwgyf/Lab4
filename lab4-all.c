@@ -34,15 +34,15 @@ int main(void) {
 	printf("Which file would you like to open?\n>>");
 	scanf("%d", &selection);
 	printf("%d", selection);
-	int numarray [MAX];
+	int numarray [MAX];//initialize arrays with max values
 	double final [MAX];
-	loadArray(numarray, selection);
+	loadArray(numarray, selection);//functions loads the array from selected file
 
 	printf("What operation would you like to perform on the signal?\n1.Offset\n2.Scale\n3.Center\n4.Normalize\n5.Save stats\n>>");
 	scanf("%d", &selection2);
 
 
-	switch(selection2)
+	switch(selection2)//asks user for input based on the operation
 	{
 		case 1:
 			printf("Enter a number to offset:");
@@ -135,7 +135,7 @@ void loadArray (int array[], int number)
 	array[0]= len;
 	array[1] = max;
 
-	for(i = 2; i < len+2; i++)
+	for(i = 2; i < len+2; i++)//scans in until the end of file using the length given in the file
 	{
 		fscanf(fp, "%d", &array[i]);
 	}
@@ -155,9 +155,9 @@ void scale (int array[], double scale, double arr[])
 void offset(int array[], double offset, double arr[])
 {
 	arr [1] = offset;
-	arr[0] = array[0];
+	arr[0] = array[0];//gives new array length
 	int i;
-	for (i = 2; i < array[0]+2; i++)
+	for (i = 2; i < array[0]+2; i++)//offsets the values and stores them into the new arrays
 	{
 		arr [i] = array[i]+offset;
 	}
@@ -209,7 +209,7 @@ void saveScale(double arr[], int number)
 			}
 	int i;
 	fprintf(fp, "%.0f %.4f\n", arr[0], arr[1]);
-	for(i = 2; i < arr[0]+2; i++)
+	for(i = 2; i < arr[0]+2; i++)//prints the new array to the file
 	{
 		fprintf(fp, "%.4f\n", arr[i]);
 	}
@@ -261,9 +261,9 @@ void saveOffset(double arr[], int number)
 			}
 	int i;
 	fprintf(fp, "%.0f %.4f\n", arr[0], arr[1]);
-	for(i = 2; i < arr[0]+2; i++)
+	for(i = 2; i < arr[0]+2; i++)//saves all of the points of the array to the file
 	{
-		fprintf(fp, "%.4f\n", arr[i]);
+		fprintf(fp, "%.4f\n", arr[i]);//prints only with four decimal places
 	}
 	fclose(fp);
 }
@@ -275,10 +275,10 @@ double getMean(int *arr)
 	int i;
 	for(i=2; i < size+2; i++)
 	{
-		sum += arr[i];
+		sum += arr[i];//finds the sum by adding them all together
 	}
 
-	mean = (1.0 * sum)/size;
+	mean = (1.0 * sum)/size;//performs calculation to find the mean
 	return mean;
 }
 
@@ -290,7 +290,7 @@ int findMax(int *arr)
 	{
 		if(arr[i] > m)
 		{
-			m = arr[i];
+			m = arr[i];//find the max by saving the greatest value each time
 		}
 	}
 
@@ -339,19 +339,19 @@ void saveStatFile(double mean, int m, int number)
 				break;
 			}
 
-	fprintf(fp, "%.4f %d", mean, m);
+	fprintf(fp, "%.4f %d", mean, m);//writes the mean and max values to the file
 	fclose(fp);
 }
 
 void centerSig(int *array, double *arr)
 {
-	double mean = getMean(array);
+	double mean = getMean(array);//centers the signal by using the offset function already written
 	offset(array, -mean, arr);
 }
 
 void normalSig(int *array, double *arr)
 {
-	int max = findMax(array);
+	int max = findMax(array);//finds the normalized signal by using the scale function already written
 	scale(array, (1.0/max), arr);
 }
 
@@ -402,7 +402,7 @@ void saveCenter(double arr[], int number)
 	fprintf(fp, "%.0f %.4f\n", arr[0], arr[1]);
 	for(i = 2; i < arr[0]+2; i++)
 	{
-		fprintf(fp, "%.4f\n", arr[i]);
+		fprintf(fp, "%.4f\n", arr[i]);//writes all the values of the array to the file
 	}
 	fclose(fp);
 }
@@ -454,7 +454,7 @@ void saveNormal(double arr[], int number)
 	fprintf(fp, "%.0f %.4f\n", arr[0], arr[1]);
 	for(i = 2; i < arr[0]+2; i++)
 	{
-		fprintf(fp, "%.4f\n", arr[i]);
+		fprintf(fp, "%.4f\n", arr[i]);//writes all the values of the array to the file with only four decimal places
 	}
 	fclose(fp);
 }

@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 {
 	if(argc < 2)
 	{
-		printf("Not enough arguments given\n");
+		printf("Not enough arguments given\n");//check make sure there are enough command line arguements
 		printf("-n File number (Value needed)\n-o offset value (value needed)\n-s scale factor (value needed)\n-S Get Statistics\n-C Center the signal\n-N Normalize the signal\n-r Rename files (name needed)\n-h Help\n");
 		return 0;
 	}
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 	int numarray [MAX];//initialize arrays with max values
 	double final [MAX];
 	int j = 1;
-	while (argv[j] != NULL)
+	while (argv[j] != NULL)//first check to see if there is a file number
 	{
 		if (argv[j][0] == '-')
 		{
@@ -67,15 +67,15 @@ int main(int argc, char* argv[])
 			j++;
 	}
 
-	if (filenum == -1)
+	if (filenum == -1)//if file num was never found say that
 	{
 		printf("No file number given. Could not perform operations\n");
 		return 0;
 	}
 	
-	loadArray(numarray, filenum);
+	loadArray(numarray, filenum);//load the array
 	j = 1;
-	while (argv[j] != NULL)
+	while (argv[j] != NULL)//check to see if it needs to be renamed
 	{
 		if (argv[j][0] == '-')
 		{
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 				break;
 			}
 			else
-				strcpy(filename, "-1");
+				strcpy(filename, "-1");//if it doesn't set it to -1
 
 		}
 		j++;
@@ -96,13 +96,13 @@ int main(int argc, char* argv[])
 	while (argv[i] != NULL)
 	{
 
-		if (argv[i][0] == '-' )
+		if (argv[i][0] == '-' )//check for dash then each command letter
 		{
 			if (argv[i][1] == 'r' || argv[i][1] == 'n')
 					i++;
 			else if(argv[i][1] == 'o')
 			{
-				if (check(argv[i+1], &i) == 1)
+				if (check(argv[i+1], &i) == 1)//checks for valud inputs
 				{
 					change = strtod(argv[i], NULL);
 					offset(numarray,change,final);
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 				//return 0;
 			}
 		}
-		else
+		else//if no valid commands it tells you which ones are wrong
 		{
 			if (argv[i][0] == '\0')
 				return 0;
@@ -179,7 +179,7 @@ void renameFile(int n, char *str2)
 int check (char* string, int *i)
 {
 	int good = 1;
-	if(string == NULL)
+	if(string == NULL)//checks for end of command line
 	{
 		good = 0;
 		printf("no parameter given\n");
@@ -200,6 +200,7 @@ int check (char* string, int *i)
 
 	if (good == 0)
 	{
+		//makes sure bad input isn't another command
 		if((strcmp(string, "-n") == 0) || (strcmp(string, "-o") == 0) || (strcmp(string, "-s") == 0) || (strcmp(string, "-S") == 0) || (strcmp(string, "-C") == 0) || (strcmp(string, "-N") == 0) || (strcmp(string, "-r") == 0) || (strcmp(string, "-h") == 0))
 		{
 			printf("no parameter given\n");
@@ -208,7 +209,7 @@ int check (char* string, int *i)
 		else
 		{
 			(*i)++;
-			printf("\n%s is not valid.\n", string);
+			printf("\n%s is not valid.\n", string);//tells you what was wrong
 			return good;
 		}
 	}
@@ -278,7 +279,7 @@ void saveScale(double arr[], int number, char *str)
 	FILE *fp;
 	char strc [50];
 	strcpy(strc, str);
-	if(strcmp(str, "-1") != 0)
+	if(strcmp(str, "-1") != 0)//handles rename case
 	{
 		char *str2 = "_scaled_data.txt";
 		str2 = strcat(strc, str2);
@@ -308,7 +309,7 @@ void saveOffset(double arr[], int number, char *str)
 	char strc[50];
 	strcpy(strc, str);
 
-	if(strcmp(str, "-1") != 0)
+	if(strcmp(str, "-1") != 0)//handles rename case
 	{
 		char *str2 = "_offset_data.txt";
 		str2 = strcat(strc, str2);
@@ -366,7 +367,7 @@ void saveStatFile(double mean, int m, int number, char *str)
 	FILE *fp;
 	char strc[50];
 	strcpy(strc, str);
-	if(strcmp(str, "-1") != 0)
+	if(strcmp(str, "-1") != 0)//handles rename case
 	{
 		char *str2 = "_statistics_data.txt";
 		str2 = strcat(strc, str2);
@@ -380,7 +381,7 @@ void saveStatFile(double mean, int m, int number, char *str)
 
 		fp = fopen(strName, "w");
 	}
-	fprintf(fp, "%.4f %d", mean, m);//saves the
+	fprintf(fp, "%.4f %d", mean, m);//saves the stats
 	fclose(fp);
 }
 
@@ -401,13 +402,13 @@ void saveCenter(double arr[], int number, char *str)
 	FILE *fp;
 	char strc [50];
 	strcpy(strc, str);
-	if(strcmp(str, "-1") != 0)
+	if(strcmp(str, "-1") != 0)//handles rename case
 	{
 		char *str2 = "_centered_data.txt";
 		str2 = strcat(strc, str2);
 		fp = fopen(str2, "w");
 	}
-	else
+	else//the non special case
 	{
 		char strName[21] = "Centered_data_nn.txt";
 		strName[14] = (number/10)+48;
@@ -429,7 +430,7 @@ void saveNormal(double arr[], int number, char* str)
 	FILE *fp;
 	char strc[50];
 	strcpy(strc, str);
-	if(strcmp(str, "-1") != 0)
+	if(strcmp(str, "-1") != 0)//handles rename case
 	{
 		char *str2 = "_normalized_data.txt";
 		str2 = strcat(strc, str2);

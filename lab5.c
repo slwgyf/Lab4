@@ -81,11 +81,20 @@ int main(int argc, char* argv[])
 		{
 			if(argv[j][1] == 'r')
 			{
-				strcpy(filename, argv[j+1]);
-				strcpy(filename1, argv[j+1]);
-				strcat (filename1, ".txt");
-				renameFile (filenum, filename1);
-				break;
+				if (argv[j+1] != NULL)
+				{
+					strcpy(filename, argv[j+1]);
+					strcpy(filename1, argv[j+1]);
+					strcat (filename1, ".txt");
+					renameFile (filenum, filename1);
+					//break;
+				}
+				else 
+				{
+					printf("File name for rename not given.\n");
+					strcpy(filename, "-1");//if it doesn't set it to -1
+					
+				}
 			}
 			else
 				strcpy(filename, "-1");//if it doesn't set it to -1
@@ -138,6 +147,10 @@ int main(int argc, char* argv[])
 				printf("-n File number (Value needed)\n-o offset value (value needed)\n-s scale factor (value needed)\n-S Get Statistics\n-C Center the signal\n-N Normalize the signal\n-r Rename files (name needed)\n-h Help\n");
 				//return 0;
 			}
+			else
+			{
+				printf("%s was an invalid input\n", argv[i]);
+			}
 		}
 		else//if no valid commands it tells you which ones are wrong
 		{
@@ -145,6 +158,9 @@ int main(int argc, char* argv[])
 				return 0;
 			printf("%s was an invalid input\n", argv[i]);
 		}
+		if (argv[i] == NULL)
+			return 0;
+		else
 		i++;
 	}
 
@@ -174,6 +190,8 @@ void renameFile(int n, char *str2)
 		else
 			break;
 	}
+	fclose (fp1);
+	fclose(fp2);
 	return;
 }
 int check (char* string, int *i)

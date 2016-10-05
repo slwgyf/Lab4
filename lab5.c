@@ -26,13 +26,18 @@ void centerSig(int *array, double *arr);
 void normalSig(int *array, double *arr);
 void saveCenter(double *arr, int number, char *str);
 void saveNormal(double *arr, int number, char *str);
-int check(char *str);
+int check(char *str, int *i);
 void renameFile(int n, char *str2);
 
 
 int main(int argc, char* argv[])
 {
-
+	if(argc < 2)
+	{
+		printf("Not enough arguments given\n");
+		printf("-n File number (Value needed)\n-o offset value (value needed)\n-s scale factor (value needed)\n-S Get Statistics\n-C Center the signal\n-N Normalize the signal\n-r Rename files (name needed)\n-h Help\n");
+		return 0;
+	}
 	float change;
 	int filenum = -1;
 	char filename[25];
@@ -47,14 +52,19 @@ int main(int argc, char* argv[])
 		{
 			if(argv[j][1] == 'n')
 			{
-				filenum = atoi (argv[j+1]);
-				//printf("\n\nFile num: %02d\n\n", filenum);
-				if (check(argv[j+1]) == 0)
-					filenum = -1;
+				filenum = -1;
+				if(check(argv[j+1], &j) == 1)
+				{
+					filenum = atoi (argv[j]);
+					break;
+				}
+				break;
 			}
-
+			else
+				j++;
 		}
-		j++;
+		else
+			j++;
 	}
 
 	if (filenum == -1)
@@ -65,7 +75,6 @@ int main(int argc, char* argv[])
 	
 	loadArray(numarray, filenum);
 	j = 1;
-	//printf("\n\n check for -r\n\n");
 	while (argv[j] != NULL)
 	{
 		if (argv[j][0] == '-')
@@ -73,10 +82,8 @@ int main(int argc, char* argv[])
 			if(argv[j][1] == 'r')
 			{
 				strcpy(filename, argv[j+1]);
-				//printf("\n%s", filename);
 				strcpy(filename1, argv[j+1]);
 				strcat (filename1, ".txt");
-				//printf("\n\nName changed to: %s\n\n", filename);
 				renameFile (filenum, filename1);
 				break;
 			}
@@ -95,24 +102,20 @@ int main(int argc, char* argv[])
 					i++;
 			else if(argv[i][1] == 'o')
 			{
-				if (check(argv[i+1]) == 1)
+				if (check(argv[i+1], &i) == 1)
 				{
-					printf("in offset block");
-					change = strtod(argv[i+1], NULL);
+					change = strtod(argv[i], NULL);
 					offset(numarray,change,final);
-					printf("numbers offset");
 					saveOffset(final, filenum, filename);
-					i++;
 				}
 			}
 			else if(argv[i][1] == 's')
 			{
-				if (check(argv[i+1]) == 1)
+				if (check(argv[i+1], &i) == 1)
 				{
-					change = strtod(argv[i+1], NULL);
+					change = strtod(argv[i], NULL);
 					scale(numarray, change, final);
 					saveScale(final, filenum, filename);
-					i++;
 				}
 			}
 			else if(argv[i][1] == 'S')
@@ -132,7 +135,7 @@ int main(int argc, char* argv[])
 			
 			else if(argv[i][1] == 'h')
 			{
-				printf("-n File number (Value needed)\n-o offset value (value needed)\n-s scale factor (value needed)\n-S Get Statistics\n-C Center the signal\n-N Normalize the signal\n-r Rename files (name needed)\n-h Help");
+				printf("-n File number (Value needed)\n-o offset value (value needed)\n-s scale factor (value needed)\n-S Get Statistics\n-C Center the signal\n-N Normalize the signal\n-r Rename files (name needed)\n-h Help\n");
 				//return 0;
 			}
 		}
@@ -173,14 +176,23 @@ void renameFile(int n, char *str2)
 	}
 	return;
 }
-int check (char* string)
+int check (char* string, int *i)
 {
 	int good = 1;
-	if (string[0] == '-' )
+	if(string == NULL)
+	{
+		good = 0;
+		printf("no parameter given\n");
+		return good;
+	}
+	if (string[0] == '-')
 	{
 		good = 0;
 	}
-
+	if(string[0] == ' ' || string[0] == '\0')
+	{
+		good = 0;
+	}
 	if (string[0] >'9' || string[0] < '0')
 	{
 		good = 0;
@@ -188,9 +200,19 @@ int check (char* string)
 
 	if (good == 0)
 	{
-		printf("\n%s is not valid.\n", string);
+		if((strcmp(string, "-n") == 0) || (strcmp(string, "-o") == 0) || (strcmp(string, "-s") == 0) || (strcmp(string, "-S") == 0) || (strcmp(string, "-C") == 0) || (strcmp(string, "-N") == 0) || (strcmp(string, "-r") == 0) || (strcmp(string, "-h") == 0))
+		{
+			printf("no parameter given\n");
+			return good;
+		}
+		else
+		{
+			(*i)++;
+			printf("\n%s is not valid.\n", string);
+			return good;
+		}
 	}
-
+	(*i)++;
 	return good;
 
 }
@@ -204,30 +226,28 @@ void loadArray (int array[], int number)
 	strName[9] =  (number/10)+48;//takes first digit of the file number
 	strName[10] = (number%10)+48;//takes second digit of the file number
 	
-	//printf("%s", strName);
 
-	if ((fp = fopen(strName, "r")) != NULL)
+
+	if ((fp = fopen(strName, "r")) == NULL)
 	{
-		//	printf("\n\nFILE %s OPENED\n\n", strName);
+		printf("\nUnable to open the file");
+		return;
 	}
 	int i;
 	int len = 0;
 	int max;
 
 	fscanf (fp, "%d %d", &len, &max);
-	//printf("%d", x);
-	
-	//printf("\n\nFILE PARAMETERS LOADED\n\n");
+
+
 	array[0] = len;//the first location holds the length
 	array[1] = max;//the second location holds the max value
-	//printf("%d", len);
 
 	for(i = 2; i < len+2; i++)
 	{
 		fscanf(fp, "%d", &array[i]);//loads the data from the file into array
 		
 	}
-	//printf("\n\nARRAY LOADED\n\n");
 	fclose(fp);
 }
 void scale (int array[], double scale, double arr[])
@@ -256,13 +276,12 @@ void offset(int array[], double offset, double arr[])
 void saveScale(double arr[], int number, char *str)
 {
 	FILE *fp;
-	char strc [25];
+	char strc [50];
 	strcpy(strc, str);
 	if(strcmp(str, "-1") != 0)
 	{
 		char *str2 = "_scaled_data.txt";
 		str2 = strcat(strc, str2);
-		printf("\n%s\n", str2);
 		fp = fopen(str2, "w");
 	}
 	else
@@ -286,14 +305,13 @@ void saveScale(double arr[], int number, char *str)
 void saveOffset(double arr[], int number, char *str)
 {
 	FILE *fp;
-	char strc[25];
+	char strc[50];
 	strcpy(strc, str);
-	printf("%s\n", str);
+
 	if(strcmp(str, "-1") != 0)
 	{
 		char *str2 = "_offset_data.txt";
 		str2 = strcat(strc, str2);
-		printf("\n%s\n", str2);
 		fp = fopen(str2, "w");
 	}
 	else
@@ -346,13 +364,12 @@ int findMax(int *arr)
 void saveStatFile(double mean, int m, int number, char *str)
 {
 	FILE *fp;
-	char strc[25];
+	char strc[50];
 	strcpy(strc, str);
 	if(strcmp(str, "-1") != 0)
 	{
 		char *str2 = "_statistics_data.txt";
 		str2 = strcat(strc, str2);
-		printf("\n%s\n", str2);
 		fp = fopen(str2, "w");
 	}
 	else
@@ -382,14 +399,13 @@ void normalSig(int *array, double *arr)
 void saveCenter(double arr[], int number, char *str)
 {
 	FILE *fp;
-	char strc [25];
+	char strc [50];
 	strcpy(strc, str);
 	if(strcmp(str, "-1") != 0)
 	{
 		char *str2 = "_centered_data.txt";
 		str2 = strcat(strc, str2);
-		printf("\n%s\n", str2);
-			fp = fopen(str2, "w");
+		fp = fopen(str2, "w");
 	}
 	else
 	{
@@ -411,13 +427,12 @@ void saveCenter(double arr[], int number, char *str)
 void saveNormal(double arr[], int number, char* str)
 {
 	FILE *fp;
-	char strc[25];
+	char strc[50];
 	strcpy(strc, str);
 	if(strcmp(str, "-1") != 0)
 	{
-		char *str2 = "_scaled_data.txt";
+		char *str2 = "_normalized_data.txt";
 		str2 = strcat(strc, str2);
-		printf("\n%s\n", str2);
 		fp = fopen(str2, "w");
 	}
 	else
